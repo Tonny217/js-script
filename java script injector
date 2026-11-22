@@ -1,0 +1,33 @@
+
+// @name Login Security Audit
+// @description Inspect login form security
+// @match https://your-lab-domain.example/*
+
+(() => {
+  console.log("[Pentest] Login audit started");
+
+  document.querySelectorAll("form").forEach((form) => {
+    const password = form.querySelector(
+      'input[type="password"]'
+    );
+
+    if (!password) return;
+
+    console.log("Login form detected");
+
+    console.log(
+      "HTTPS:",
+      location.protocol === "https:"
+    );
+
+    console.log(
+      "POST method:",
+      form.method.toLowerCase() === "post"
+    );
+
+    console.log(
+      "Password autocomplete:",
+      password.autocomplete
+    );
+  });
+})();
