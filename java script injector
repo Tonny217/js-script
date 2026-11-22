@@ -1,33 +1,44 @@
 
-// @name Login Security Audit
-// @description Inspect login form security
-// @match https://your-lab-domain.example/*
+ // @name Universal Web Security Auditor
+ // @description Passive login and XSS security checks
+ // @match *://*/*
 
 (() => {
-  console.log("[Pentest] Login audit started");
+  if (window.__webAuditRunning) return;
+  window.__webAuditRunning = true;
 
-  document.querySelectorAll("form").forEach((form) => {
-    const password = form.querySelector(
-      'input[type="password"]'
-    );
+  console.log("=== Web Security Audit ===");
+  console.log("Domain:", location.hostname);
+  console.log("HTTPS:", location.protocol === "https:");
 
-    if (!password) return;
+  // Inspect forms
+  document.querySelectorAll("form").forEach((form, i) => {
+    console.log("Form:", i + 1);
+    console.log("Method:", form.method);
+    console.log("Action:", form.action);
 
-    console.log("Login form detected");
+    if (form.querySelector('[type="password"]')) {
+      console.log("Login form detected");
 
-    console.log(
-      "HTTPS:",
-      location.protocol === "https:"
-    );
-
-    console.log(
-      "POST method:",
-      form.method.toLowerCase() === "post"
-    );
-
-    console.log(
-      "Password autocomplete:",
-      password.autocomplete
-    );
+      if (location.protocol !== "https:") {
+        console.warn("Warning: Login page is not HTTPS");
+      }
+    }
   });
+
+  // Inspect password fields without reading their values
+  document.querySelectorAll('input[type="password"]')
+    .forEach(input => {
+      console.log("Password autocomplete:", input.autocomplete);
+    });
+
+  // Inspect cookies visible to JavaScript
+  console.log("JS-visible cookies:", document.cookie);
+
+  // Inspect security-related response headers
+  console.log(
+    "Security headers must be checked in Network responses."
+  );
+
+  console.log("=== Audit complete ===");
 })();
